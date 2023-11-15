@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using CachingManager.interfaces;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace CachingManager
             _trackedKeys = new HashSet<string>();
         }
 
-        public T GetCachedData<T>(string key)
+        public T GetData<T>(string key)
         {
             if (_memoryCache.TryGetValue(key, out T cachedData))
             {
@@ -31,7 +32,7 @@ namespace CachingManager
             return default(T);
         }
 
-        public void SetCachedData<T>(string key, T value, TimeSpan expiresIn)
+        public void SetData<T>(string key, T value, TimeSpan expiresIn)
         {
             var cacheEntryOptions = new MemoryCacheEntryOptions
             {
@@ -42,10 +43,11 @@ namespace CachingManager
             _trackedKeys.Add(key);
         }
 
-        public void DeleteCachedData(string key)
+        public bool DeleteByKey(string key)
         {
             _memoryCache.Remove(key);
             _trackedKeys.Remove(key);
+            return true;
         }
 
         public List<string> GetAllKeys()
@@ -68,7 +70,7 @@ namespace CachingManager
             return allData;
         }
 
-        public void Truncate()
+        public bool Truncate()
         {
             foreach (var key in _trackedKeys)
             {
@@ -76,6 +78,8 @@ namespace CachingManager
             }
 
             _trackedKeys.Clear();
+
+            return true;
         }
     }
 }

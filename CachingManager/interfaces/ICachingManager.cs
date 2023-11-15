@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CachingManager
+namespace CachingManager.interfaces
 {
     /// <summary>
     /// Interface for a cache manager responsible for handling caching operations.
