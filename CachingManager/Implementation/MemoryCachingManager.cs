@@ -1,21 +1,109 @@
-﻿using CachingManager.interfaces;
+﻿using CachingManager.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace CachingManager
+namespace CachingManager.Implementation
 {
-    internal class MemoryCachingManagerV2 : ICachingManager
+    internal class MemoryCachingManager : ICachingManager
     {
         private readonly IMemoryCache _memoryCache;
 
-        public MemoryCachingManagerV2(IMemoryCache memoryCache)
+        public MemoryCachingManager(IMemoryCache memoryCache)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+        }
+
+        public Task<T> GetDataAsync<T>(string key)
+        {
+            if (_memoryCache.TryGetValue(key, out T cachedData))
+            {
+                // Cache hit
+                return Task.FromResult(cachedData);
+            }
+
+            // Cache miss
+            return default;
+        }
+
+        public Task SetDataAsync<T>(string key, T value, TimeSpan expiresIn)
+        {
+            // Get the current list of keys
+            var trackedKeys = GetTrackedKeys();
+
+            // Add the new key to the list
+            trackedKeys.Add(key);
+
+            // Store the updated list of keys in the cache
+            UpdateTrackedKeys(trackedKeys);
+
+            // Set the data in the cache
+            var cacheEntryOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = expiresIn
+            };
+
+            _memoryCache.Set(key, value, cacheEntryOptions);
+
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteByKeyAsync(string key)
+        {
+            // Get the current list of keys
+            var trackedKeys = GetTrackedKeys();
+
+            // Remove the key from the list
+            trackedKeys.Remove(key);
+
+            // Store the updated list of keys in the cache
+            UpdateTrackedKeys(trackedKeys);
+
+            // Remove the data from the cache
+            _memoryCache.Remove(key);
+
+            return Task.CompletedTask;
+        }
+
+        public Task<List<string>> GetAllKeysAsync()
+        {
+            // Get the current list of keys
+            return Task.FromResult(GetTrackedKeys());
+        }
+
+        public Task<Dictionary<string, string>> GetAllAsync()
+        {
+            var allData = new Dictionary<string, string>();
+
+            // Get the current list of keys
+            var trackedKeys = GetTrackedKeys();
+
+            // Retrieve data for each key in the list
+            foreach (var key in trackedKeys)
+            {
+                if (_memoryCache.TryGetValue(key, out string value))
+                {
+                    allData.Add(key, value);
+                }
+            }
+
+            return Task.FromResult(allData);
+        }
+
+        public Task TruncateAsync()
+        {
+            // Get the current list of keys
+            var trackedKeys = GetTrackedKeys();
+
+            // Clear all entries in the cache
+            foreach (var key in trackedKeys)
+            {
+                _memoryCache.Remove(key);
+            }
+
+            // Clear the list of tracked keys
+            UpdateTrackedKeys(new List<string>());
+
+            return Task.CompletedTask;
         }
 
         private List<string> GetTrackedKeys()
@@ -35,96 +123,6 @@ namespace CachingManager
             // Store the updated list of keys in the cache
             var keysJson = JsonSerializer.Serialize(keys);
             _memoryCache.Set("CachedKeys", keysJson);
-        }
-
-        public T GetData<T>(string key)
-        {
-            if (_memoryCache.TryGetValue(key, out T cachedData))
-            {
-                // Cache hit
-                return cachedData;
-            }
-
-            // Cache miss
-            return default(T);
-        }
-
-        public void SetData<T>(string key, T value, TimeSpan expiresIn)
-        {
-            // Get the current list of keys
-            var trackedKeys = GetTrackedKeys();
-
-            // Add the new key to the list
-            trackedKeys.Add(key);
-
-            // Store the updated list of keys in the cache
-            UpdateTrackedKeys(trackedKeys);
-
-            // Set the data in the cache
-            var cacheEntryOptions = new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = expiresIn
-            };
-
-            _memoryCache.Set(key, value, cacheEntryOptions);
-        }
-
-        public bool DeleteByKey(string key)
-        {
-            // Get the current list of keys
-            var trackedKeys = GetTrackedKeys();
-
-            // Remove the key from the list
-            trackedKeys.Remove(key);
-
-            // Store the updated list of keys in the cache
-            UpdateTrackedKeys(trackedKeys);
-
-            // Remove the data from the cache
-            _memoryCache.Remove(key);
-
-            return true;
-        }
-
-        public List<string> GetAllKeys()
-        {
-            // Get the current list of keys
-            return GetTrackedKeys();
-        }
-
-        public Dictionary<string, string> GetAll()
-        {
-            var allData = new Dictionary<string, string>();
-
-            // Get the current list of keys
-            var trackedKeys = GetTrackedKeys();
-
-            // Retrieve data for each key in the list
-            foreach (var key in trackedKeys)
-            {
-                if (_memoryCache.TryGetValue(key, out string value))
-                {
-                    allData.Add(key, value);
-                }
-            }
-
-            return allData;
-        }
-
-        public bool Truncate()
-        {
-            // Get the current list of keys
-            var trackedKeys = GetTrackedKeys();
-
-            // Clear all entries in the cache
-            foreach (var key in trackedKeys)
-            {
-                _memoryCache.Remove(key);
-            }
-
-            // Clear the list of tracked keys
-            UpdateTrackedKeys(new List<string>());
-            return true;
         }
     }
 }
