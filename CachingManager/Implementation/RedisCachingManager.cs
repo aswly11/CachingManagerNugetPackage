@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CachingManager.Implementation
 {
-    internal class RedisCachingManager : ICachingManager
+    internal class RedisCachingManager : ICachingManagerAsync
     {
         private readonly IDatabase _database;
         private readonly JsonSerializerOptions _jsonOptions;

@@ -13,7 +13,8 @@ namespace CachingManager.Injection
     {
         public static void AddInMemoryCaching(this IServiceCollection services)
         {
-            services.AddSingleton<ICachingManager, MemoryCachingManager>();
+            services.AddSingleton<ICachingManagerAsync, MemoryCachingManager>();
+            services.AddSingleton<ICachingManagerAsync, RedisCachingManager>();
         }
     }
 }

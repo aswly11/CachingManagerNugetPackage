@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace CachingManager.Implementation
 {
-    internal class MemoryCachingManager : ICachingManager
+    internal class MemoryCachingManager : ICachingManagerAsync
     {
         private readonly IMemoryCache _memoryCache;
 
