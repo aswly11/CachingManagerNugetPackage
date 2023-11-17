@@ -37,7 +37,7 @@ namespace CachingManager
             _memoryCache.Set("CachedKeys", keysJson);
         }
 
-        public T GetCachedData<T>(string key)
+        public T GetData<T>(string key)
         {
             if (_memoryCache.TryGetValue(key, out T cachedData))
             {
@@ -49,7 +49,7 @@ namespace CachingManager
             return default(T);
         }
 
-        public void SetCachedData<T>(string key, T value, TimeSpan expiresIn)
+        public void SetData<T>(string key, T value, TimeSpan expiresIn)
         {
             // Get the current list of keys
             var trackedKeys = GetTrackedKeys();
@@ -69,7 +69,7 @@ namespace CachingManager
             _memoryCache.Set(key, value, cacheEntryOptions);
         }
 
-        public void DeleteCachedData(string key)
+        public bool DeleteByKey(string key)
         {
             // Get the current list of keys
             var trackedKeys = GetTrackedKeys();
@@ -82,6 +82,8 @@ namespace CachingManager
 
             // Remove the data from the cache
             _memoryCache.Remove(key);
+
+            return true;
         }
 
         public List<string> GetAllKeys()
@@ -109,7 +111,7 @@ namespace CachingManager
             return allData;
         }
 
-        public void Truncate()
+        public bool Truncate()
         {
             // Get the current list of keys
             var trackedKeys = GetTrackedKeys();
@@ -122,6 +124,7 @@ namespace CachingManager
 
             // Clear the list of tracked keys
             UpdateTrackedKeys(new List<string>());
+            return true;
         }
     }
 }

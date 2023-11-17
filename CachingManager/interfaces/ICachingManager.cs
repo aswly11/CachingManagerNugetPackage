@@ -17,7 +17,7 @@ namespace CachingManager.interfaces
         /// <typeparam name="T">The type of data to retrieve from the cache.</typeparam>
         /// <param name="key">The unique key associated with the cached data.</param>
         /// <returns>The cached data of type T if available; otherwise, the default value for type T.</returns>
-        T GetCachedData<T>(string key);
+        T GetData<T>(string key);
 
         /// <summary>
         /// Sets cached data of type T with the specified key and expiration time.
@@ -26,13 +26,13 @@ namespace CachingManager.interfaces
         /// <param name="key">The unique key to associate with the cached data.</param>
         /// <param name="value">The data to be cached.</param>
         /// <param name="expiresIn">The duration for which the data should be cached before expiration.</param>
-        void SetCachedData<T>(string key, T value, TimeSpan expiresIn);
+        void SetData<T>(string key, T value, TimeSpan expiresIn);
 
         /// <summary>
         /// Deletes cached data associated with the specified key.
         /// </summary>
         /// <param name="key">The key of the data to be deleted from the cache.</param>
-        void DeleteCachedData(string key);
+        bool DeleteByKey(string key);
 
         /// <summary>
         /// Gets a list of all keys present in the cache.
@@ -49,6 +49,6 @@ namespace CachingManager.interfaces
         /// <summary>
         /// Removes all items from the cache, effectively truncating it.
         /// </summary>
-        void Truncate();
+        bool Truncate();
     }
 }
