@@ -15,7 +15,7 @@ namespace CachingManager.Injection
                 return ConnectionMultiplexer.Connect(configure);
             });
 
-            services.AddSingleton<ICachingManagerAsync, RedisCachingManager>();
+            //services.AddSingleton<ICachingManagerAsync, RedisCachingManager>();
 
         }
     }

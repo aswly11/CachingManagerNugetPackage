@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CachingManager.Interfaces
 {
-    internal interface ICachingManagerAsync
+    public interface ICachingManagerAsync
     {
         /// <summary>
         /// Asynchronously retrieves cached data of type T based on the provided key.
