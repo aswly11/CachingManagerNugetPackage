@@ -14,7 +14,9 @@ namespace CachingManager.Implementation
         private readonly IDatabase _database;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public RedisCachingManager(IConnectionMultiplexer connectionMultiplexer)
+
+        private TimeSpan? _expiresIn { get; set; }
+        public RedisCachingManager(IConnectionMultiplexer connectionMultiplexer, TimeSpan? expiresIn)
         {
             _database = connectionMultiplexer.GetDatabase();
             _jsonOptions = new JsonSerializerOptions
@@ -22,6 +24,7 @@ namespace CachingManager.Implementation
                 PropertyNameCaseInsensitive = true,
                 WriteIndented = true
             };
+            _expiresIn = expiresIn;
         }
         public Task<Dictionary<string, string>> GetAllAsync()
         {
@@ -69,12 +72,12 @@ namespace CachingManager.Implementation
                 throw ex;
             }
         }
-        public async Task SetDataAsync<T>(string key, T value, TimeSpan expiresIn)
+        public async Task SetDataAsync<T>(string key, T value, TimeSpan? expiresIn)
         {
             try
             {
                 var serializedData = JsonSerializer.Serialize(value, _jsonOptions);
-                await _database.StringSetAsync(key, serializedData, expiresIn);
+                await _database.StringSetAsync(key, serializedData, _expiresIn ?? expiresIn ?? TimeSpan.FromHours(1));
             }
             catch (Exception ex)
             {

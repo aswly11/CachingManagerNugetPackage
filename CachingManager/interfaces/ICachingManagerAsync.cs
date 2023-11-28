@@ -8,6 +8,7 @@ namespace CachingManager.Interfaces
 {
     public interface ICachingManagerAsync
     {
+
         /// <summary>
         /// Asynchronously retrieves cached data of type T based on the provided key.
         /// </summary>
@@ -23,7 +24,7 @@ namespace CachingManager.Interfaces
         /// <param name="key">The unique key to associate with the cached data.</param>
         /// <param name="value">The data to be cached.</param>
         /// <param name="expiresIn">The duration for which the data should be cached before expiration.</param>
-        Task SetDataAsync<T>(string key, T value, TimeSpan expiresIn);
+        Task SetDataAsync<T>(string key, T value, TimeSpan? expiresIn);
 
         /// <summary>
         /// Asynchronously deletes cached data associated with the specified key.

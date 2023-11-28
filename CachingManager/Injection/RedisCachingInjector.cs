@@ -1,5 +1,6 @@
 ﻿using CachingManager.Implementation;
 using CachingManager.Interfaces;
+using CachingManager.Models;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
@@ -7,15 +8,15 @@ namespace CachingManager.Injection
 {
     public static class RedisCachingInjector
     {
-        public static void AddInRedisCaching(this IServiceCollection services, string connectionString)
+        public static void AddRedisCaching(this IServiceCollection services, CachingManagerOptions cachingManagerOptions)
         {
-            services.AddSingleton<IConnectionMultiplexer>(c =>
+            var connectionMultiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions
             {
-                var configure = ConfigurationOptions.Parse(connectionString, true);
-                return ConnectionMultiplexer.Connect(configure);
+                EndPoints = { cachingManagerOptions.ConnectionString },
+                AbortOnConnectFail = false,
+       
             });
-
-            //services.AddSingleton<ICachingManagerAsync, RedisCachingManager>();
+            services.AddSingleton<ICachingManagerAsync>(new RedisCachingManager(connectionMultiplexer, cachingManagerOptions.ExpiresIn));
 
         }
     }

@@ -25,7 +25,7 @@ namespace CachingManager.Implementation
             return default;
         }
 
-        public Task SetDataAsync<T>(string key, T value, TimeSpan expiresIn)
+        public Task SetDataAsync<T>(string key, T value, TimeSpan? expiresIn)
         {
             // Get the current list of keys
             var trackedKeys = GetTrackedKeys();
@@ -39,7 +39,7 @@ namespace CachingManager.Implementation
             // Set the data in the cache
             var cacheEntryOptions = new MemoryCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = expiresIn
+                AbsoluteExpirationRelativeToNow = expiresIn ??  TimeSpan.FromHours(1)
             };
 
             _memoryCache.Set(key, value, cacheEntryOptions);
