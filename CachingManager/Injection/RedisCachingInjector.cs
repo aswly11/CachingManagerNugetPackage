@@ -6,18 +6,16 @@ using StackExchange.Redis;
 
 namespace CachingManager.Injection
 {
-    public static class RedisCachingInjector
-    {
-        public static void AddRedisCaching(this IServiceCollection services, CachingManagerOptions cachingManagerOptions)
-        {
-            var connectionMultiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions
-            {
-                EndPoints = { cachingManagerOptions.ConnectionString },
-                AbortOnConnectFail = false,
-       
-            });
-            services.AddSingleton<ICachingManagerAsync>(new RedisCachingManager(connectionMultiplexer, cachingManagerOptions.ExpiresIn));
-
-        }
-    }
+	public static class RedisCachingInjector
+	{
+		public static void AddRedisCaching(this IServiceCollection services, CachingManagerOptions cachingManagerOptions)
+		{
+			var connectionMultiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions
+			{
+				EndPoints = { cachingManagerOptions.ConnectionString },
+				AbortOnConnectFail = false,
+			});
+			services.AddSingleton<ICachingManagerAsync>(new RedisCachingManager(connectionMultiplexer, cachingManagerOptions.ExpiresIn));
+		}
+	}
 }

@@ -1,11 +1,6 @@
 ﻿using CachingManager.Implementation;
 using CachingManager.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CachingManager.Injection
 {
@@ -13,6 +8,8 @@ namespace CachingManager.Injection
     {
         public static void AddInMemoryCaching(this IServiceCollection services)
         {
+            services.AddMemoryCache(); // Add memory caching services
+
             services.AddSingleton<ICachingManagerAsync, MemoryCachingManager>();
         }
     }
